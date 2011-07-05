@@ -52,16 +52,18 @@ def tatsu_zine( id, doc = nil )
 		<img class="amazon-detail left" src="#{h image}"
 		height="150" width="100"
 		alt="#{h title}">
-		<div class="amazon-detail-desc">
+		<span class="amazon-detail-desc">
 			<span class="amazon-title">#{h title}</span><br>
 			<span class="amazon-author">#{h author}</span><br>
 			<span class="amazon-label">#{h description}</span><br>
-		</div><br style="clear: left">
+		</span><br style="clear: left">
 	</div></a>
 EOS
 
 	tatsu_zine_cache_set( id, result ) unless @conf.secure
 	result
+rescue
+	link
 end
 
 # Local Variables:
