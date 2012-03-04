@@ -81,6 +81,19 @@ $(function () {
 				}
 			});
 		},
+		
+		getPhotosRecentlyUploaded: function (fn) {
+			var timerId = this.setErrorHandler();
+			$.ajax({
+				url: 'http://picasaweb.google.com/data/feed/api/user/' + this.userId,
+				data: 'alt=json-in-script&imgmax=' + this.imgMax + '&thumbsize=200&kind=photo&max-results=25',
+				dataType: 'jsonp',
+				success: function (data) {
+					clearTimeout(timerId);
+					fn(data.feed.entry);
+				}
+			});
+		},
 
 		setErrorHandler: function () {
 			var timerId = setTimeout(function () {
@@ -101,16 +114,76 @@ $(function () {
 		'value': 'Get Picasa Web Albums List'
 	}).appendTo('#plugin_picasa');
 
+	$('<input>')
+		.attr({
+			id: 'plugin_picasa_recent',
+			type: 'button',
+			value: 'Listing photos recently uploaded'
+		})
+		.css({
+			'margin-left': '5px'
+		})
+		.appendTo('#plugin_picasa');
+
+	var showTitle = function() {
+		$('<h3>')
+			.append($('<span>', {
+				text: 'Picasa Web Album'
+			}))
+			.appendTo('#plugin_picasa');
+		$('#plugin_picasa')
+			.css({
+			'height': '350px'
+			});
+	};
+	
+	var loadPhotos = function(i, photo) {
+		$('<img>')
+			.click(function () {
+				$('#body').insertAtCaret($.makePluginTag('picasa', [photo.content.src, $.trim(photo.summary.$t)]));
+			})
+			.attr({
+				src: photo.media$group.media$thumbnail[0].url,
+				title: $.trim(photo.summary.$t),
+				alt: $.trim(photo.summary.$t)
+			})
+			.css({
+				'cursor': 'pointer',
+				'margin': '5px',
+				'border': 'solid 1px #aaa'
+			})
+			.appendTo('#photos');
+	};
+
+	var service = new PicasaService($tDiary.plugin.picasa.userId, $tDiary.plugin.picasa.imgMax);
+	var loading = new CanvasLoadingImage();
+	
+	$('#plugin_picasa_recent').click(function(){
+		$('#plugin_picasa').empty();
+		showTitle();
+		$(loading.canvas).appendTo($('#plugin_picasa'));
+		loading.start();
+		service.getPhotosRecentlyUploaded(function (photos) {
+			$(loading.canvas).hide();
+			loading.stop();
+			$('<div>')
+				.css({
+					'overflow': 'auto',
+					'height': '300px'
+				})
+				.attr('id', 'photos')
+				.addClass('photo')
+				.appendTo('#plugin_picasa');
+			$.each(photos, function(i, photo){
+				loadPhotos(i, photo);
+			});
+		});
+
+	});
+
 	$('#plugin_picasa_btn').click(function () {
 		$('#plugin_picasa').empty();
-		var service = new PicasaService($tDiary.plugin.picasa.userId, $tDiary.plugin.picasa.imgMax);
-		var loading = new CanvasLoadingImage();
-		$('<h3>').append($('<span>', {
-			text: 'Picasa Web Album'
-		})).appendTo('#plugin_picasa');
-		$('#plugin_picasa').css({
-			'height': '350px'
-		});
+		showTitle();
 		$(loading.canvas).appendTo($('#plugin_picasa'));
 		loading.start();
 		$('<ul>').css({
