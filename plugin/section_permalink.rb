@@ -16,7 +16,7 @@ def anchor( s )
 			s1 = $1
 			s2 = $2
 			if $2 =~ /^p/
-				"?date=#{s1}&p=#{s2.gsub(/p/, '')}"
+				"?date=#{s1}&amp;p=#{s2.gsub(/p/, '')}"
 			else
 				"?date=#{s1}.html##{s2}"
 			end
@@ -52,7 +52,7 @@ add_header_proc do
 	if section_mode? and diary = @diaries[@date.strftime('%Y%m%d')]
 		index = @cgi.params['p'][0]
 <<-EOS
-<script>
+<script type="text/javascript">
 $(document).ready(function() {
   var anc = $("a[name=p#{h(index)}]");
   anc.parent().css("background-color", "yellow");

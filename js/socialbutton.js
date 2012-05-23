@@ -65,29 +65,45 @@ $(function() {
         size: 'medium',
         lang: $('html').attr('lang')
       };
-    }
+    },
+
+    pinterest: function(url, title) {
+      return { 
+        url: url,
+		  media: $('p img:first', $('div.section h3 a[name=' + url.substr(-3) + ']').parent().parent()).attr('src'),
+        description: title,
+        button: 'horizontal',
+      };
+    },
+    
   };
 
   function socialbutton(target) {
     $('.socialbuttons').css('height', '1em')
-    if ($tDiary.blogkit) { // blogkit
-      $('.day', target).each(function() {
-        var link = $(this).children('h2').find('a:first').get(0);
-        var url = link ? link.href : document.URL;
-        var title = $(this).children('h2').find('.title').text();
-        var socialbuttons = $(this).find('.socialbuttons');
+    var bottom = $(window).height() + $(window).scrollTop();
 
-        append_button(url, title, socialbuttons);
+    $($tDiary.blogkit ? '.day' : '.section')
+      .filter(function() {
+        return bottom > $(this).offset().top;
+      })
+      .filter(function() {
+        return $(this).find('.socialbutton').size() == 0
+      })
+      .each(function() {
+        if ($tDiary.blogkit) {
+          var link = $(this).children('h2').find('a:first').get(0);
+          var url = link ? link.href : document.URL;
+          var title = $(this).children('h2').find('.title').text();
+        } else {
+          var url = $(this).children('h3').children('a').get(0).href;
+          var title = $(this).children('h3').children('a').attr('title');
+        }
+        if (url && title) {
+          // console.debug('loading socialbutton: ' + title);
+          var socialbuttons = $(this).find('.socialbuttons');
+          append_button(url, title, socialbuttons);
+        }
       });
-    } else { // diary
-      $('.section', target).each(function() {
-        var url = $(this).children('h3').children('a').get(0).href;
-        var title = $(this).children('h3').children('a').attr('title');
-        var socialbuttons = $(this).find('.socialbuttons');
-
-        append_button(url, title, socialbuttons);
-      });
-    }
   }
 
   function append_button(url, title, socialbuttons) {
@@ -102,17 +118,9 @@ $(function() {
     });
   }
 
-  // for AutoPagerize
-  $(window).bind('AutoPagerize_DOMNodeInserted', function(event) {
-    socialbutton(event.target);
+  $(window).bind('scroll', function(event) {
+    socialbutton(document);
   });
-
-  // for AuthPatchWork
-  // NOTE: jQuery.bind() cannot handle an event that include a dot charactor.
-  // see http://todayspython.blogspot.com/2011/06/autopager-autopagerize.html
-  window.addEventListener('AutoPatchWork.DOMNodeInserted', function(event) {
-    socialbutton(event.target);
-  }, false);
 
   socialbutton(document);
 });

@@ -109,7 +109,7 @@ module ::TDiary
 			@plugin = ::TDiary::Plugin::new(
 							'conf' => @conf,
 							'cgi' => @cgi,
-							'cache_path' => cache_path,
+							'cache_path' => @io.cache_path,
 							'diaries' => @diaries
 							)
 			def @plugin.apply_plugin_alt( str, remove_tag = false )
@@ -231,7 +231,7 @@ end
 if mode == "CMD"
 	begin
 		require 'cgi'
-		if TDiary::Config.instance_method(:initialize).arity > 0
+		if TDiary::Config.instance_method(:initialize).arity != 0
 			# for tDiary 2.1 or later
 			cgi = CGI.new
 			conf = TDiary::Config::new(cgi)
