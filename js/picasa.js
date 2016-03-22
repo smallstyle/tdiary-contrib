@@ -114,7 +114,7 @@ $(function () {
 			var self = this;
 			$.ajax({
 				url: '//picasaweb.google.com/data/feed/api/user/' + this.userId,
-				data: 'alt=json-in-script&imgmax=' + this.imgMax + '&thumbsize=200&kind=photo&max-results=25&start-index=' + this.recently_uploaded_photo_start_index,
+				data: 'alt=json-in-script&imgmax=' + this.imgMax + '&thumbsize=200&max-results=25&start-index=' + this.recently_uploaded_photo_start_index,
 				dataType: 'jsonp',
 				success: function (data) {
 					clearTimeout(timerId);
